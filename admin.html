@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeliBot Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1B6B3A',
+                        action: '#E07B1A',
+                        'bg-light': '#F4F4F4'
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        body: ['"Outfit"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #F4F4F4;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .animate-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .view-section {
+            display: none !important;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .view-section.active {
+            display: flex !important;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased h-screen overflow-hidden flex">
+
+    <!-- Mobile Header -->
+    <div
+        class="md:hidden fixed top-0 w-full z-30 bg-white border-b border-slate-200 p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <button id="mobile-menu-btn" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 class="text-xl font-bold text-primary font-display">DeliBot Admin</h1>
+        </div>
+        <a href="menu.html"
+            class="flex items-center justify-center p-2 text-slate-500 bg-slate-100 hover:text-action rounded-full">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                </path>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 bg-white w-64 border-r border-slate-200 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col shadow-xl md:shadow-none h-full">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold font-display text-primary flex items-center gap-2">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" class="text-action"
+                        viewBox="0 0 24 24">
+                        <path d="M8 8h8M8 12h8M8 16h8"></path>
+                        <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+                    </svg>
+                    DeliBot
+                </h1>
+                <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-wider">Restaurante Demo</p>
+            </div>
+            <button id="close-sidebar-btn"
+                class="md:hidden p-2 text-slate-400 hover:text-slate-700 bg-slate-50 rounded-lg">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <button data-target="view-dashboard"
+                class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all active-nav">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                </svg>
+                Dashboard
+            </button>
+            <button data-target="view-pedidos"
+                class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                    </path>
+                </svg>
+                Pedidos
+            </button>
+            <button data-target="view-menu"
+                class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M4 6h16M4 12h16M4 18h7"></path>
+                </svg>
+                Gestión de Menú
+            </button>
+            <button data-target="view-mesas"
+                class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                    <path d="M3 9h18M9 21V9"></path>
+                </svg>
+                Mapa de Mesas
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-slate-100">
+            <a href="menu.html"
+                class="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors w-full">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"></path>
+                </svg>
+                Ir a Menú Cliente
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col bg-bg-light md:ml-64 h-full mt-16 md:mt-0 pb-0 min-h-0">
+
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="view-section active animate-in max-w-6xl mx-auto space-y-6 p-4 md:p-6 w-full">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold font-display text-slate-800">Panel General</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="dashboard-stats">
+                <!-- Stats injected here -->
+            </div>
+        </div>
+
+        <!-- PEDIDOS KANBAN VIEW -->
+        <div id="view-pedidos"
+            class="view-section animate-in p-4 md:p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold font-display text-slate-800">Tablero de Pedidos</h2>
+                <p class="text-slate-500 text-sm mt-1">Arrastra o haz clic para avanzar pedidos</p>
+            </div>
+            <div class="flex-1 flex gap-5 overflow-x-auto pb-4 hide-scrollbar snap-x px-1 min-w-0" id="kanban-board">
+                <!-- Columns injected here -->
+            </div>
+        </div>
+
+        <!-- MENU MANAGER VIEW -->
+        <div id="view-menu" class="view-section animate-in max-w-6xl mx-auto space-y-6 p-4 md:p-6 w-full">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold font-display text-slate-800">Gestión de Menú</h2>
+                    <p class="text-slate-500 text-sm mt-1">Administra los productos, precios y disponibilidad</p>
+                </div>
+                <button onclick="openMenuModal()"
+                    class="bg-action hover:bg-action-dark text-white shadow-sm shadow-action/20 font-bold py-2.5 px-5 rounded-xl transition-all flex items-center shadow-lg active:scale-95">
+                    <svg class="mr-2" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    Agregar Producto
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+                    <div class="relative max-w-md">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="20" height="20"
+                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="menu-search" placeholder="Buscar por nombre o categoría..."
+                            class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-600">
+                        <thead class="text-xs text-slate-500 uppercase bg-white border-b border-slate-100">
+                            <tr>
+                                <th class="px-6 py-4 font-semibold w-16">Img</th>
+                                <th class="px-6 py-4 font-semibold">Producto</th>
+                                <th class="px-6 py-4 font-semibold text-center">Categoría</th>
+                                <th class="px-6 py-4 font-semibold text-right">Precio</th>
+                                <th class="px-6 py-4 font-semibold text-center">Estado</th>
+                                <th class="px-6 py-4 font-semibold text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-table-body">
+                            <!-- Products injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MESAS VIEW -->
+        <div id="view-mesas" class="view-section animate-in max-w-6xl mx-auto space-y-6 p-4 md:p-6 w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold font-display text-slate-800">Mapa de Mesas</h2>
+                    <p class="text-slate-500 text-sm mt-1">Supervisa la ocupación y genera códigos QR</p>
+                </div>
+                <div class="flex gap-4 text-sm font-medium">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div> Libre
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div> Ocupada
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="mesas-grid">
+                <!-- Mesas injected here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modals -->
+    <div id="modal-backdrop" onclick="closeModals()"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4"></div>
+
+    <!-- Menu Modal -->
+    <div id="menu-modal"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-full max-w-md z-[60] hidden p-6 animate-in zoom-in duration-200"
+        style="max-height: 90vh; overflow-y: auto;">
+        <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+            <h3 id="menu-modal-title" class="text-lg font-bold font-display text-slate-800">Nuevo Producto</h3>
+            <button onclick="closeModals()"
+                class="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"><svg width="20" height="20"
+                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg></button>
+        </div>
+        <form id="menu-form" class="space-y-4">
+            <input type="hidden" id="menu-id">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nombre del producto</label>
+                <input type="text" id="menu-nombre" required
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Descripción</label>
+                <textarea id="menu-desc" required
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none h-20"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Precio (COP)</label>
+                    <input type="number" id="menu-precio" required min="0"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Categoría</label>
+                    <select id="menu-categoria"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-white">
+                        <option value="Entradas">Entradas</option>
+                        <option value="Platos">Platos</option>
+                        <option value="Bebidas">Bebidas</option>
+                        <option value="Postres">Postres</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">URL Imagen</label>
+                <input type="text" id="menu-imagen"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                    placeholder="https://images.unsplash.com/...">
+            </div>
+            <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-lg mt-2">
+                <div>
+                    <p class="text-sm font-bold text-slate-800">Producto Activo</p>
+                    <p class="text-xs text-slate-500">¿Visible en el menú cliente?</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="menu-activo" class="sr-only peer" checked>
+                    <div
+                        class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                    </div>
+                </label>
+            </div>
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-2">
+                <button type="button" onclick="closeModals()"
+                    class="px-5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancelar</button>
+                <button type="submit"
+                    class="px-5 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl transition-colors shadow-sm focus:ring-2 focus:ring-primary/50">Guardar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- QR Modal -->
+    <div id="qr-modal"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-full max-w-sm z-[60] hidden p-6 text-center animate-in zoom-in duration-200">
+        <h3 id="qr-modal-title"
+            class="text-lg font-bold font-display text-slate-800 mb-4 border-b border-slate-100 pb-3">Mesa X</h3>
+        <p class="text-slate-500 text-sm mb-6">Escanea para acceder al menú de la mesa.</p>
+        <div
+            class="mx-auto w-48 h-48 bg-white border border-slate-200 shadow-inner rounded-2xl flex items-center justify-center p-4 mb-6">
+            <!-- Simulated QR code visually -->
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" class="text-slate-800" stroke="currentColor"
+                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <rect x="7" y="7" width="3" height="3"></rect>
+                <rect x="14" y="7" width="3" height="3"></rect>
+                <rect x="7" y="14" width="3" height="3"></rect>
+                <rect x="14" y="14" width="3" height="3"></rect>
+            </svg>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 px-4 py-2 rounded-lg text-xs text-slate-600 font-mono mb-6 truncate"
+            id="qr-modal-link">
+            https://delibot.app/menu/1?mesa=X
+        </div>
+        <button onclick="closeModals()"
+            class="w-full px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">Cerrar</button>
+    </div>
+
+
+    <script>
+        // Data State
+        let STATE = {
+            pedidos: [
+                { id: "ord-001", origen: "Mesa 3", items: [{ id: "p1", nombre: "Bandeja Saludable", cantidad: 2, precio: 20000 }, { id: "b4", nombre: "Jugo de mora", cantidad: 2, precio: 5000 }], total: 50000, estado: "En preparación", hora: "12:30 PM" },
+                { id: "ord-002", origen: "Domicilio", items: [{ id: "e2", nombre: "Pizza", cantidad: 1, precio: 15000 }, { id: "p2", nombre: "Sopa de pollo", cantidad: 1, precio: 15000 }], total: 30000, estado: "Recibido", hora: "12:45 PM" },
+                { id: "ord-003", origen: "Mesa 5", items: [{ id: "e3", nombre: "Hamburgesa con papas fritas", cantidad: 1, precio: 20000 }, { id: "b1", nombre: "Limonada", cantidad: 2, precio: 4000 }], total: 28000, estado: "Listo", hora: "12:15 PM" },
+                { id: "ord-004", origen: "Domicilio", items: [{ id: "p3", nombre: "Pollo con caldo", cantidad: 3, precio: 28000 }], total: 84000, estado: "Entregado", hora: "11:30 AM" },
+                { id: "ord-005", origen: "Mesa 1", items: [{ id: "p4", nombre: "Frijoles con arepa", cantidad: 1, precio: 12000 }, { id: "b3", nombre: "Café", cantidad: 2, precio: 5000 }], total: 22000, estado: "Recibido", hora: "12:55 PM" },
+                { id: "ord-006", origen: "Domicilio", items: [{ id: "d4", nombre: "Torta de Estrellas", cantidad: 1, precio: 50000 }], total: 50000, estado: "En preparación", hora: "12:40 PM" },
+                { id: "ord-007", origen: "Mesa 8", items: [{ id: "d1", nombre: "Pastel de Chocolate", cantidad: 2, precio: 30000 }], total: 60000, estado: "Listo", hora: "12:10 PM" },
+                { id: "ord-008", origen: "Domicilio", items: [{ id: "e1", nombre: "Menú del dia", cantidad: 2, precio: 14000 }], total: 28000, estado: "Entregado", hora: "11:00 AM" }
+            ],
+            productos: [
+                { id: "e1", nombre: "Menú del dia", descripcion: "el mejor menu para cualquier dia", precio: 14000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "e2", nombre: "Pizza", descripcion: "Pizza de muy buena calidad", precio: 15000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "e3", nombre: "Hamburgesa con papas fritas", descripcion: "Hamburgesa barata y buena", precio: 20000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "p1", nombre: "Bandeja Saludable", descripcion: "Para que sigas con tu dieta puedes pedir este plato", precio: 20000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "p2", nombre: "Sopa de pollo", descripcion: "Sopa tradicional con pollo", precio: 15000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "p3", nombre: "Pollo con caldo", descripcion: "Caldo sustancioso con pollo ", precio: 28000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "p4", nombre: "Frijoles con arepa", descripcion: "Frijoles con arepa muy buenos", precio: 12000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "p5", nombre: "Carne con papas", descripcion: "Carne muy frezca con papas a su punto", precio: 20000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "b1", nombre: "Limonada", descripcion: "Bebida fria super deliciosa.", precio: 4000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "b3", nombre: "Café", descripcion: "Café tradicional hervido con canela y panela.", precio: 5000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "b4", nombre: "Jugo de mora", descripcion: "Bebida ancestral a base mora", precio: 5000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "d1", nombre: "Pastel de Chocolate", descripcion: "Pasetel de chocolate pa que quede lleno", precio: 30000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "d2", nombre: "Postre de Fresas", descripcion: "Fresas buenas para agregarle dulce a la comida", precio: 7000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "d3", nombre: "Brevas con Arequipe", descripcion: "Arequipe de la mas alta calidad", precio: 7000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+                { id: "d4", nombre: "Torta de Estrellas", descripcion: "torta que viene del espacio", precio: 50000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=600&h=400&q=80", activo: true }
+            ],
+            mesas: [
+                { id: "m1", numero: 1, estado: "Libre" }, { id: "m2", numero: 2, estado: "Libre" }, { id: "m3", numero: 3, estado: "Ocupada" },
+                { id: "m4", numero: 4, estado: "Libre" }, { id: "m5", numero: 5, estado: "Ocupada" }, { id: "m6", numero: 6, estado: "Libre" },
+                { id: "m7", numero: 7, estado: "Libre" }, { id: "m8", numero: 8, estado: "Libre" }, { id: "m9", numero: 9, estado: "Libre" }, { id: "m10", numero: 10, estado: "Libre" }
+            ]
+        };
+
+        const COLUMNAS = [
+            { id: 'Recibido', titulo: 'Recibido', badgeColor: 'bg-blue-500' },
+            { id: 'En preparación', titulo: 'En Preparación', badgeColor: 'bg-yellow-500' },
+            { id: 'Listo', titulo: 'Listo', badgeColor: 'bg-green-500' },
+            { id: 'Entregado', titulo: 'Entregado', badgeColor: 'bg-slate-500' }
+        ];
+
+        // Format Currency
+        const formatCOP = (val) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val);
+
+        // Sidebar & Navigation Logic
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const toggleSidebar = () => {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }
+        };
+
+        document.getElementById('mobile-menu-btn').onclick = toggleSidebar;
+        document.getElementById('close-sidebar-btn').onclick = toggleSidebar;
+        overlay.onclick = toggleSidebar;
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.onclick = () => {
+                // Update active state
+                document.querySelectorAll('.nav-btn').forEach(b => {
+                    b.classList.remove('bg-primary/10', 'text-primary');
+                    b.classList.add('text-slate-600');
+                });
+                btn.classList.add('bg-primary/10', 'text-primary');
+                btn.classList.remove('text-slate-600');
+
+                // Show target view
+                const target = btn.getAttribute('data-target');
+                document.querySelectorAll('.view-section').forEach(view => {
+                    view.classList.remove('active');
+                    if (view.id === target) view.classList.add('active');
+                });
+
+                if (window.innerWidth < 768) toggleSidebar();
+            };
+        });
+
+        // initial nav state
+        document.querySelector('[data-target="view-dashboard"]').click();
+
+
+        // -- RENDERERS --
+
+        function getStatusColor(estado) {
+            if (estado === 'Recibido') return 'bg-blue-100 text-blue-700 border-blue-200';
+            if (estado === 'En preparación') return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+            if (estado === 'Listo') return 'bg-green-100 text-green-700 border-green-200';
+            return 'bg-slate-100 text-slate-700 border-slate-200';
+        }
+
+        // Render Dashboard
+        function renderDashboard() {
+            const activos = STATE.pedidos.filter(p => p.estado !== 'Entregado').length;
+            const completadosHoy = STATE.pedidos.filter(p => p.estado === 'Entregado').length;
+            const ingresos = STATE.pedidos.filter(p => p.estado === 'Entregado').reduce((acc, p) => acc + p.total, 0);
+
+            document.getElementById('dashboard-stats').innerHTML = `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-slate-500 text-sm font-medium mb-1">Pedidos Activos</h3>
+                    <div class="text-3xl font-bold text-slate-800 font-display">${activos}</div>
+                    <div class="mt-2 text-xs text-green-500 font-medium">+2 en hora actual</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-slate-500 text-sm font-medium mb-1">Completados Hoy</h3>
+                    <div class="text-3xl font-bold text-slate-800 font-display">${completadosHoy}</div>
+                    <div class="mt-2 text-xs text-green-500 font-medium">100% éxito</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-slate-500 text-sm font-medium mb-1">Ingresos del Día</h3>
+                    <div class="text-3xl font-bold text-slate-800 font-display">${formatCOP(ingresos)}</div>
+                    <div class="mt-2 text-xs text-green-500 font-medium">+15.2% vs ayer</div>
+                </div>
+            `;
+        }
+
+        // Render Kanban
+        window.moveOrder = (id, curState) => {
+            const idx = COLUMNAS.findIndex(c => c.id === curState);
+            if (idx > -1 && idx < COLUMNAS.length - 1) {
+                const nextState = COLUMNAS[idx + 1].id;
+                STATE.pedidos = STATE.pedidos.map(p => p.id === id ? { ...p, estado: nextState } : p);
+                renderKanban();
+                renderDashboard();
+            }
+        };
+
+        window.allowDrop = (ev) => {
+            ev.preventDefault();
+        };
+
+        window.drag = (ev, id) => {
+            ev.dataTransfer.setData("id", id);
+        };
+
+        window.drop = (ev, newState) => {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("id");
+            if (id) {
+                STATE.pedidos = STATE.pedidos.map(p => p.id === id ? { ...p, estado: newState } : p);
+                renderKanban();
+                renderDashboard();
+            }
+        };
+
+        function renderKanban() {
+            let html = '';
+            COLUMNAS.forEach(col => {
+                const peds = STATE.pedidos.filter(p => p.estado === col.id);
+                let cardsHtml = '';
+                peds.forEach(p => {
+                    const nextBtnHtml = col.id !== 'Entregado' ? `
+                        <div class="absolute inset-0 bg-slate-900/5 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl z-10 cursor-pointer" onclick="moveOrder('${p.id}', '${p.estado}')">
+                            <button class="bg-primary text-white border border-primary-dark px-4 py-2 rounded-lg font-bold shadow-xl flex items-center transform transition-transform hover:scale-105 active:scale-95 text-sm">
+                                Avanzar <svg class="ml-1" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                    ` : '';
+
+                    cardsHtml += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 relative group overflow-hidden hover:shadow-md transition-all cursor-grab active:cursor-grabbing" draggable="true" ondragstart="drag(event, '${p.id}')">
+                            <div class="flex justify-between items-start mb-3 relative z-0">
+                                <span class="font-bold text-slate-900 text-lg border-b-2 border-primary/20 leading-none pb-1">#${p.id.split('-')[1]}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wide bg-slate-100 text-slate-600 font-bold border border-slate-200">${p.origen}</span>
+                            </div>
+                            <div class="text-sm text-slate-600 mb-4 space-y-1.5 relative z-0">
+                                ${p.items.map(i => `<div class="flex items-start gap-2"><span class="font-bold text-slate-800">${i.cantidad}x</span><span class="leading-tight">${i.nombre}</span></div>`).join('')}
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-slate-100 relative z-0">
+                                <span class="bg-slate-50 px-2 py-1 rounded text-xs text-slate-500 font-medium border border-slate-100">${p.hora}</span>
+                                <span class="font-bold text-primary">${formatCOP(p.total)}</span>
+                            </div>
+                            ${nextBtnHtml}
+                        </div>
+                    `;
+                });
+
+                if (peds.length === 0) {
+                    cardsHtml = `<div class="h-24 flex items-center justify-center text-sm font-medium text-slate-400 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50">Sin pedidos</div>`;
+                }
+
+                html += `
+                    <div class="flex flex-col bg-slate-50 rounded-2xl min-w-[300px] w-[300px] border border-slate-200 hide-scrollbar overflow-hidden h-full" ondragover="allowDrop(event)" ondrop="drop(event, '${col.id}')">
+                        <div class="p-4 border-b border-slate-200 bg-white flex justify-between items-center sticky top-0 z-20">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full ${col.badgeColor} shadow-sm"></span>
+                                ${col.titulo}
+                            </h3>
+                            <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-lg text-xs font-bold shadow-sm border border-slate-200">${peds.length}</span>
+                        </div>
+                        <div class="flex-1 p-3 space-y-3 overflow-y-auto">
+                            ${cardsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('kanban-board').innerHTML = html;
+        }
+
+        // Render Menu
+        let searchTerm = '';
+        document.getElementById('menu-search').addEventListener('input', e => {
+            searchTerm = e.target.value.toLowerCase();
+            renderMenu();
+        });
+
+        window.toggleProducto = (id) => {
+            STATE.productos = STATE.productos.map(p => p.id === id ? { ...p, activo: !p.activo } : p);
+            renderMenu();
+        };
+
+        window.deleteProducto = (id) => {
+            if (confirm('¿Eliminar producto?')) {
+                STATE.productos = STATE.productos.filter(p => p.id !== id);
+                renderMenu();
+            }
+        };
+
+        window.openMenuModal = (id = null) => {
+            document.getElementById('modal-backdrop').classList.remove('hidden');
+            document.getElementById('modal-backdrop').classList.add('flex');
+            document.getElementById('menu-modal').classList.remove('hidden');
+
+            const form = document.getElementById('menu-form');
+            if (id) {
+                const p = STATE.productos.find(p => p.id === id);
+                document.getElementById('menu-modal-title').innerText = 'Editar Producto';
+                document.getElementById('menu-id').value = p.id;
+                document.getElementById('menu-nombre').value = p.nombre;
+                document.getElementById('menu-desc').value = p.descripcion;
+                document.getElementById('menu-precio').value = p.precio;
+                document.getElementById('menu-categoria').value = p.categoria;
+                document.getElementById('menu-imagen').value = p.imagen;
+                document.getElementById('menu-activo').checked = p.activo;
+            } else {
+                document.getElementById('menu-modal-title').innerText = 'Nuevo Producto';
+                form.reset();
+                document.getElementById('menu-id').value = '';
+                document.getElementById('menu-categoria').value = 'Platos';
+                document.getElementById('menu-activo').checked = true;
+            }
+        };
+
+        document.getElementById('menu-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const id = document.getElementById('menu-id').value;
+            const nuevo = {
+                id: id || ('p' + Date.now()),
+                nombre: document.getElementById('menu-nombre').value,
+                descripcion: document.getElementById('menu-desc').value,
+                precio: parseInt(document.getElementById('menu-precio').value),
+                categoria: document.getElementById('menu-categoria').value,
+                imagen: document.getElementById('menu-imagen').value,
+                activo: document.getElementById('menu-activo').checked
+            };
+
+            if (id) {
+                STATE.productos = STATE.productos.map(p => p.id === id ? nuevo : p);
+            } else {
+                STATE.productos.unshift(nuevo);
+            }
+            closeModals();
+            renderMenu();
+        });
+
+        function renderMenu() {
+            const filtered = STATE.productos.filter(p => p.nombre.toLowerCase().includes(searchTerm) || p.categoria.toLowerCase().includes(searchTerm));
+            let html = '';
+            filtered.forEach(p => {
+                html += `
+                    <tr class="border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-3">
+                            <div class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 flex items-center justify-center text-slate-400">
+                                ${p.imagen ? `<img src="${p.imagen}" class="w-full h-full object-cover">` : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>'}
+                            </div>
+                        </td>
+                        <td class="px-6 py-3">
+                            <div class="font-bold text-slate-800 text-base">${p.nombre}</div>
+                            <div class="text-xs text-slate-500 line-clamp-1 max-w-xs mt-0.5">${p.descripcion}</div>
+                        </td>
+                        <td class="px-6 py-3 text-center">
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-blue-50 text-blue-600 border border-blue-100">${p.categoria}</span>
+                        </td>
+                        <td class="px-6 py-3 font-bold text-right text-primary">
+                            ${formatCOP(p.precio)}
+                        </td>
+                        <td class="px-6 py-3 text-center">
+                            <div class="flex flex-col items-center gap-1 cursor-pointer" onclick="toggleProducto('${p.id}')">
+                                <div class="w-10 h-5 rounded-full relative transition-colors ${p.activo ? 'bg-primary' : 'bg-slate-300'}">
+                                    <div class="w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all ${p.activo ? 'left-5' : 'left-0.5'}"></div>
+                                </div>
+                                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wide">${p.activo ? 'Visible' : 'Oculto'}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-3 text-right">
+                            <div class="flex justify-end gap-2">
+                                <button onclick="openMenuModal('${p.id}')" class="p-2 text-slate-400 hover:text-action hover:bg-orange-50 rounded-lg transition-colors" title="Editar">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                </button>
+                                <button onclick="deleteProducto('${p.id}')" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            if (filtered.length === 0) html = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Sin productos.</td></tr>`;
+            document.getElementById('menu-table-body').innerHTML = html;
+        }
+
+        // Render Mesas
+        window.toggleMesa = (id) => {
+            STATE.mesas = STATE.mesas.map(m => {
+                if (m.id === id) {
+                    return { ...m, estado: m.estado === 'Libre' ? 'Ocupada' : 'Libre' };
+                }
+                return m;
+            });
+            renderMesas();
+        };
+
+        window.openQrModal = (numero) => {
+            document.getElementById('qr-modal-title').innerText = `Mesa ${numero} - RestauranteDemo`;
+            document.getElementById('qr-modal-link').innerText = `https://delibot.app/menu/1?mesa=${numero}`;
+            document.getElementById('modal-backdrop').classList.remove('hidden');
+            document.getElementById('modal-backdrop').classList.add('flex');
+            document.getElementById('qr-modal').classList.remove('hidden');
+        };
+
+        window.closeModals = () => {
+            document.getElementById('modal-backdrop').classList.add('hidden');
+            document.getElementById('modal-backdrop').classList.remove('flex');
+            document.getElementById('menu-modal').classList.add('hidden');
+            document.getElementById('qr-modal').classList.add('hidden');
+        };
+
+        function renderMesas() {
+            let html = '';
+            STATE.mesas.forEach(m => {
+                const isLibre = m.estado === 'Libre';
+                const colorBg = isLibre ? 'bg-white hover:border-green-200 border-transparent' : 'bg-red-50 border-red-100';
+                const avatarBg = isLibre ? 'bg-slate-100 text-slate-400' : 'bg-red-100 text-red-500';
+                const statusBg = isLibre ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200';
+                const btnStyle = isLibre ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50' : 'bg-transparent text-red-500 hover:bg-red-50 border-red-100';
+                const dotColor = isLibre ? 'bg-green-500' : 'bg-red-500';
+
+                html += `
+                    <div class="relative ${colorBg} border-2 p-5 rounded-2xl shadow-sm transition-all hover:shadow-md flex flex-col items-center text-center">
+                        <div class="absolute top-3 right-3 w-3 h-3 rounded-full ${dotColor} cursor-pointer hover:scale-125 transition-transform" onclick="toggleMesa('${m.id}')" title="Alternar Estado"></div>
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center mb-3 mt-2 ${avatarBg}">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold font-display text-slate-800 mb-1">Mesa ${m.numero}</h3>
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg border ${statusBg} mb-4 cursor-pointer hover:bg-slate-100" onclick="toggleMesa('${m.id}')" title="Alternar Estado">${m.estado}</span>
+                        <button onclick="openQrModal('${m.numero}')" class="w-full mt-auto py-2 text-sm font-bold border rounded-xl flex items-center justify-center transition-colors ${btnStyle}">
+                            <svg class="mr-2" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z"></path></svg>
+                            Ver QR
+                        </button>
+                    </div>
+                `;
+            });
+            document.getElementById('mesas-grid').innerHTML = html;
+        }
+
+        // Initialize App
+        function init() {
+            renderDashboard();
+            renderKanban();
+            renderMenu();
+            renderMesas();
+        }
+
+        init();
+
+    </script>
+</body>
+
+</html>
