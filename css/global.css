@@ -1,0 +1,228 @@
+/**
+ * Estilos Globales - Aplican a toda la aplicación
+ * Reset, tipografía, comportamientos generales
+ */
+
+/* ==================== RESET Y ESTILOS BASE ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-crema);
+    color: var(--gray-700);
+    line-height: 1.6;
+    font-weight: var(--font-normal);
+    font-size: var(--text-base);
+}
+
+/* ==================== TIPOGRAFÍA ==================== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: var(--font-bold);
+    line-height: 1.2;
+    color: var(--gray-900);
+}
+
+h1 { font-size: var(--text-4xl); }
+h2 { font-size: var(--text-3xl); }
+h3 { font-size: var(--text-2xl); }
+h4 { font-size: var(--text-xl); }
+h5 { font-size: var(--text-lg); }
+h6 { font-size: var(--text-base); }
+
+p {
+    margin-bottom: var(--space-md);
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+/* ==================== ELEMENTOS DE FORMULARIO ==================== */
+input, textarea, select, button {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+}
+
+input, textarea, select {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-fast);
+    background-color: var(--white);
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(27, 107, 58, 0.1);
+}
+
+/* ==================== BOTONES ==================== */
+button {
+    cursor: pointer;
+    border: none;
+    font-weight: var(--font-semibold);
+    transition: var(--transition-fast);
+    border-radius: var(--radius-lg);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* ==================== ANIMACIONES ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==================== UTILIDADES ==================== */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--space-sm); }
+.mt-2 { margin-top: var(--space-md); }
+.mt-3 { margin-top: var(--space-lg); }
+.mt-4 { margin-top: var(--space-xl); }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--space-sm); }
+.mb-2 { margin-bottom: var(--space-md); }
+.mb-3 { margin-bottom: var(--space-lg); }
+.mb-4 { margin-bottom: var(--space-xl); }
+
+.pt-4 { padding-top: var(--space-xl); }
+.pb-4 { padding-bottom: var(--space-xl); }
+.px-4 { padding-left: var(--space-xl); padding-right: var(--space-xl); }
+
+.gap-2 { gap: var(--space-md); }
+.gap-3 { gap: var(--space-lg); }
+.gap-4 { gap: var(--space-xl); }
+
+.hidden { display: none; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+.w-full { width: 100%; }
+
+/* ==================== SCROLLBAG PERSONALIZADO ==================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
+    transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+}
+
+/* ==================== MEDIA QUERIES COMUNES ==================== */
+@media (max-width: 768px) {
+    h1 { font-size: var(--text-3xl); }
+    h2 { font-size: var(--text-2xl); }
+    h3 { font-size: var(--text-xl); }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: var(--text-2xl); }
+    h2 { font-size: var(--text-xl); }
+    h3 { font-size: var(--text-lg); }
+}
+
+/* ==================== ACCESIBILIDAD ==================== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==================== PRINT ==================== */
+@media print {
+    body {
+        background: white;
+    }
+    button, a {
+        display: none;
+    }
+}

@@ -165,7 +165,7 @@
             </button>
         </nav>
 
-        <div class="p-4 border-t border-slate-100">
+        <div class="p-4 border-t border-slate-100 space-y-2">
             <a href="menu.html"
                 class="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors w-full">
                 <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
@@ -174,6 +174,14 @@
                 </svg>
                 Ir a Menú Cliente
             </a>
+            <button id="logout-btn"
+                class="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-red-600 hover:bg-red-50 transition-colors w-full w-full">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1"></path>
+                </svg>
+                Cerrar Sesión
+            </button>
         </div>
     </aside>
 
@@ -748,8 +756,32 @@
             document.getElementById('mesas-grid').innerHTML = html;
         }
 
+        // ==================== FUNCIONES DE SESIÓN ====================
+        function checkSession() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Mostrar nombre del usuario (opcional)
+            console.log('Usuario:', currentUser.name);
+        }
+
+        function logout() {
+            if (confirm('¿Deseas cerrar sesión?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Agregar event listener al botón de logout
+        document.getElementById('logout-btn')?.addEventListener('click', logout);
+
         // Initialize App
         function init() {
+            checkSession();
             renderDashboard();
             renderKanban();
             renderMenu();

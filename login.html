@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeliBot - Inicio de Sesión</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Modular -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M8 8h8M8 12h8M8 16h8"></path>
+                    <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+                </svg>
+            </div>
+            <h1 class="app-title">DeliBot</h1>
+            <p class="app-subtitle">Sistema de Gestión de Restaurante</p>
+        </div>
+
+        <!-- Main Form Container -->
+        <div class="form-container">
+            <!-- Tabs Navigation -->
+            <div class="tabs-navigation">
+                <button class="tab-btn active" data-tab="admin">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Administrador
+                </button>
+                <button class="tab-btn" data-tab="cocinero">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M12 2a1 1 0 0 1 1 1v4a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1Z"></path>
+                        <path d="M4.22 10.22a1 1 0 0 1 1.41 0l2.83 2.83a1 1 0 0 1-1.41 1.41L4.22 11.63a1 1 0 0 1 0-1.41Z"></path>
+                        <path d="M2 16a1 1 0 0 1 1-1h4a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1Z"></path>
+                        <path d="M19.78 10.22a1 1 0 0 0-1.41 0l-2.83 2.83a1 1 0 1 0 1.41 1.41l2.83-2.83a1 1 0 0 0 0-1.41Z"></path>
+                        <path d="M22 16a1 1 0 0 0-1-1h-4a1 1 0 0 0 0 2h4a1 1 0 0 0 1-1Z"></path>
+                        <path d="M12 19a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"></path>
+                    </svg>
+                    Cocinero
+                </button>
+            </div>
+
+            <!-- Separator Line -->
+            <div class="separator"></div>
+
+            <!-- Admin Login Form -->
+            <form id="admin-form" class="auth-form active" data-role="admin">
+                <h2 class="form-title">Bienvenido, Administrador</h2>
+                <p class="form-subtitle">Ingresa tus credenciales para acceder al panel</p>
+
+                <div class="form-group">
+                    <label for="admin-email" class="form-label">Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <path d="m22 6-10 7L2 6"></path>
+                        </svg>
+                        <input type="email" id="admin-email" name="email" placeholder="admin@delibot.com" required
+                            class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-password" class="form-label">Contraseña</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="admin-password" name="password" placeholder="••••••••" required
+                            class="form-input">
+                        <button type="button" class="toggle-password" onclick="togglePassword(this)">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember" class="form-checkbox">
+                        <span>Recuérdame</span>
+                    </label>
+                    <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Iniciar Sesión
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                </button>
+
+                <div class="form-divider">
+                    <span>¿No tienes cuenta?</span>
+                </div>
+
+                <button type="button" class="btn btn-secondary btn-block" onclick="toggleRegister('admin')">
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <!-- Cocinero Login Form -->
+            <form id="cocinero-form" class="auth-form" data-role="cocinero">
+                <h2 class="form-title">Bienvenido, Cocinero</h2>
+                <p class="form-subtitle">Ingresa tus credenciales para acceder a tu área</p>
+
+                <div class="form-group">
+                    <label for="cocinero-email" class="form-label">Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <path d="m22 6-10 7L2 6"></path>
+                        </svg>
+                        <input type="email" id="cocinero-email" name="email" placeholder="cocinero@delibot.com"
+                            required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cocinero-password" class="form-label">Contraseña</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="cocinero-password" name="password" placeholder="••••••••" required
+                            class="form-input">
+                        <button type="button" class="toggle-password" onclick="togglePassword(this)">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember" class="form-checkbox">
+                        <span>Recuérdame</span>
+                    </label>
+                    <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Iniciar Sesión
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                </button>
+
+                <div class="form-divider">
+                    <span>¿No tienes cuenta?</span>
+                </div>
+
+                <button type="button" class="btn btn-secondary btn-block" onclick="toggleRegister('cocinero')">
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <!-- Registration Form (Hidden by default) -->
+            <form id="register-form" class="auth-form" style="display: none;" data-role="register">
+                <button type="button" class="back-btn" onclick="toggleRegister()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Volver
+                </button>
+
+                <h2 class="form-title">Crear Nueva Cuenta</h2>
+                <p class="form-subtitle">Completa los datos para registrarte</p>
+
+                <div class="form-group">
+                    <label for="register-name" class="form-label">Nombre Completo</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="text" id="register-name" name="name" placeholder="Tu nombre completo" required
+                            class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-email" class="form-label">Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <path d="m22 6-10 7L2 6"></path>
+                        </svg>
+                        <input type="email" id="register-email" name="email" placeholder="tu@correo.com" required
+                            class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-password" class="form-label">Contraseña</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="register-password" name="password" placeholder="••••••••" required
+                            class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="register-confirm" class="form-label">Confirmar Contraseña</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="register-confirm" name="confirm" placeholder="••••••••" required
+                            class="form-input">
+                    </div>
+                </div>
+
+                <div id="role-selector" class="role-selector">
+                    <label class="form-label">Selecciona tu rol</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="role" value="admin" class="form-radio">
+                            <span>Administrador</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="role" value="cocinero" class="form-radio">
+                            <span>Cocinero</span>
+                        </label>
+                    </div>
+                </div>
+
+                <label class="checkbox-label checkbox-terms">
+                    <input type="checkbox" name="terms" required class="form-checkbox">
+                    <span>Acepto los <a href="#" class="terms-link">términos y condiciones</a></span>
+                </label>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Registrarse
+                </button>
+            </form>
+
+            <!-- Success Message -->
+            <div id="success-message" class="success-message" style="display: none;">
+                <div class="success-icon">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h3>¡Bienvenido!</h3>
+                <p id="success-text"></p>
+                <p class="redirect-text">Redirigiendo en <span id="countdown">3</span> segundos...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p>&copy; 2024 DeliBot. Todos los derechos reservados. | <a href="#">Política de Privacidad</a></p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/login.js"></script>
+</body>
+
+</html>

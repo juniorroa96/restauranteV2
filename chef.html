@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeliBot Chef - Panel de Pedidos</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1B6B3A',
+                        action: '#E07B1A',
+                        'bg-light': '#F4F4F4'
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        body: ['"Outfit"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #F4F4F4;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .animate-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .view-section {
+            display: none !important;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .view-section.active {
+            display: flex !important;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased h-screen overflow-hidden flex">
+
+    <!-- Mobile Header -->
+    <div
+        class="md:hidden fixed top-0 w-full z-30 bg-white border-b border-slate-200 p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <h1 class="text-xl font-bold text-primary font-display">DeliBot Chef</h1>
+        </div>
+        <button id="logout-mobile" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside
+        class="w-64 bg-white border-r border-slate-200 flex flex-col shadow-lg h-full hidden md:flex">
+        <div class="p-6 border-b border-slate-100">
+            <h1 class="text-2xl font-bold font-display text-primary flex items-center gap-2">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" class="text-action"
+                    viewBox="0 0 24 24">
+                    <path d="M14 14.5v1M10 10h.01M6 18h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"></path>
+                </svg>
+                DeliBot Chef
+            </h1>
+            <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-wider">Panel de Pedidos</p>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <button data-target="view-pedidos"
+                class="nav-btn w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all active text-white bg-primary">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                    </path>
+                </svg>
+                Pedidos
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-slate-100">
+            <button id="logout-btn"
+                class="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-red-600 hover:bg-red-50 transition-colors w-full">
+                <svg class="mr-3" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1"></path>
+                </svg>
+                Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col bg-bg-light h-full mt-16 md:mt-0 pb-0 min-h-0">
+
+        <!-- PEDIDOS VIEW -->
+        <div id="view-pedidos" class="view-section active animate-in p-4 md:p-6">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold font-display text-slate-800">Pedidos en Vivo</h2>
+                    <p class="text-slate-500 text-sm mt-1">Gestiona los pedidos de la cocina</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="refresh-btn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary font-semibold transition-colors flex items-center gap-2">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M1 4v6h6M23 20v-6h-6"></path>
+                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kanban Board -->
+            <div class="flex gap-6 overflow-x-auto pb-4 hide-scrollbar" id="kanban-board">
+                <!-- Pendiente -->
+                <div class="flex-shrink-0 w-96 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                    <div class="p-4 border-b border-slate-100 bg-yellow-50">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            Pendiente
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1" id="pending-count">0 pedidos</p>
+                    </div>
+                    <div class="flex-1 p-4 space-y-3 overflow-y-auto" id="pending-orders">
+                        <div class="text-center text-slate-400 py-8">No hay pedidos pendientes</div>
+                    </div>
+                </div>
+
+                <!-- En Preparación -->
+                <div class="flex-shrink-0 w-96 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                    <div class="p-4 border-b border-slate-100 bg-blue-50">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            En Preparación
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1" id="cooking-count">0 pedidos</p>
+                    </div>
+                    <div class="flex-1 p-4 space-y-3 overflow-y-auto" id="cooking-orders">
+                        <div class="text-center text-slate-400 py-8">No hay pedidos en preparación</div>
+                    </div>
+                </div>
+
+                <!-- Listo -->
+                <div class="flex-shrink-0 w-96 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                    <div class="p-4 border-b border-slate-100 bg-green-50">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            Listo para Entregar
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1" id="ready-count">0 pedidos</p>
+                    </div>
+                    <div class="flex-1 p-4 space-y-3 overflow-y-auto" id="ready-orders">
+                        <div class="text-center text-slate-400 py-8">No hay pedidos listos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ==================== FUNCIONES DE SESIÓN ====================
+        function checkSession() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (!currentUser || currentUser.role !== 'cocinero') {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Mostrar nombre del usuario
+            console.log('Usuario:', currentUser.name);
+        }
+
+        function logout() {
+            if (confirm('¿Deseas cerrar sesión?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // ==================== BOTONES DE LOGOUT ====================
+        document.getElementById('logout-btn')?.addEventListener('click', logout);
+        document.getElementById('logout-mobile')?.addEventListener('click', logout);
+
+        // ==================== DATOS DE EJEMPLO ====================
+        const mockOrders = [
+            { id: 1, table: 3, items: ['Hamburguesa', 'Papas'], status: 'pending', time: '2 min' },
+            { id: 2, table: 5, items: ['Pizza Margarita', 'Refresco'], status: 'pending', time: '1 min' },
+            { id: 3, table: 1, items: ['Ensalada', 'Bebida'], status: 'cooking', time: '5 min' },
+            { id: 4, table: 2, items: ['Pollo a la Brasa', 'Puré'], status: 'cooking', time: '8 min' },
+            { id: 5, table: 4, items: ['Sándwich', 'Postre'], status: 'ready', time: 'Listo' }
+        ];
+
+        function renderOrders() {
+            const pendingOrders = mockOrders.filter(o => o.status === 'pending');
+            const cookingOrders = mockOrders.filter(o => o.status === 'cooking');
+            const readyOrders = mockOrders.filter(o => o.status === 'ready');
+
+            renderOrdersSection('pending-orders', 'pending-count', pendingOrders);
+            renderOrdersSection('cooking-orders', 'cooking-count', cookingOrders);
+            renderOrdersSection('ready-orders', 'ready-count', readyOrders);
+        }
+
+        function renderOrdersSection(containerId, countId, orders) {
+            const container = document.getElementById(containerId);
+            const countElement = document.getElementById(countId);
+
+            if (orders.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-8">No hay pedidos</div>';
+                countElement.textContent = '0 pedidos';
+                return;
+            }
+
+            container.innerHTML = orders.map(order => `
+                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-bold text-primary">Mesa #${order.table}</span>
+                        <span class="text-xs bg-primary text-white px-2 py-1 rounded">Pedido #${order.id}</span>
+                    </div>
+                    <div class="text-sm text-slate-600 mb-3">
+                        ${order.items.map(item => `<div>• ${item}</div>`).join('')}
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-500">${order.time}</span>
+                        <button class="text-primary text-xs font-semibold hover:text-primary">Actualizar</button>
+                    </div>
+                </div>
+            `).join('');
+
+            countElement.textContent = `${orders.length} pedido${orders.length !== 1 ? 's' : ''}`;
+        }
+
+        // ==================== INICIALIZACIÓN ====================
+        checkSession();
+        renderOrders();
+
+        document.getElementById('refresh-btn')?.addEventListener('click', () => {
+            renderOrders();
+        });
+    </script>
+</body>
+
+</html>
