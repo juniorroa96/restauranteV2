@@ -39,4 +39,5 @@ body {
             display: flex !important;
             flex-direction: column;
             overflow-y: auto;
+            flex: 1;
         }

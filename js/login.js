@@ -261,3 +261,7 @@ class AuthApp {
 // Inicializar la app con opción de backend (ajustable para Java)
 const app = new AuthApp({ serviceOptions: { useBackend: false, baseUrl: '/api' } });
 
+// Exportar helpers globales para los atributos onclick presentes en login.html
+window.toggleRegister = (role) => app.toggleRegister(role);
+window.togglePassword = (button) => app.togglePassword(button);
+

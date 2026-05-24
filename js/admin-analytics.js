@@ -8,8 +8,7 @@
 
 const ANALYTICS = {
   period: 'today', // 'today', 'week', 'month'
-  
-  // Mock data: órdenes con estado "Entregado"
+
   mockOrders: [
     { id: 'ORD-001', timestamp: new Date(new Date().setHours(8, 15)), estado: 'Entregado', items: [{ id: 'e1', name: 'Menú del día', qty: 2, price: 14000 }, { id: 'b1', name: 'Limonada', qty: 2, price: 4000 }], total: 36000 },
     { id: 'ORD-002', timestamp: new Date(new Date().setHours(8, 45)), estado: 'Entregado', items: [{ id: 'e2', name: 'Pizza', qty: 1, price: 15000 }], total: 15000 },
@@ -20,23 +19,75 @@ const ANALYTICS = {
     { id: 'ORD-007', timestamp: new Date(new Date().setHours(19, 0)), estado: 'Entregado', items: [{ id: 'p3', name: 'Pollo con caldo', qty: 1, price: 28000 }, { id: 'b4', name: 'Jugo de mora', qty: 1, price: 5000 }], total: 33000 },
   ],
 
+  getOrdersFromState() {
+    if (!window.STATE || !Array.isArray(window.STATE.pedidos)) {
+      return this.mockOrders;
+    }
+
+    return window.STATE.pedidos.map(order => {
+      const timestamp = this.parseTimestamp(order.timestamp, order.hora);
+      const items = Array.isArray(order.items) ? order.items.map(item => ({
+        id: item.id || `${item.nombre || item.name}-${item.cantidad || item.qty || 1}`,
+        name: item.nombre || item.name || 'Producto',
+        qty: Number(item.cantidad || item.qty || 1),
+        price: Number(item.precio || item.price || 0)
+      })) : [];
+
+      const total = Number(order.total != null ? order.total : items.reduce((sum, item) => sum + item.price * item.qty, 0));
+      const estado = String(order.estado || '').trim() || 'Entregado';
+
+      return { id: order.id || `ORD-${Date.now()}`, timestamp, estado, items, total };
+    });
+  },
+
+  parseTimestamp(timestamp, hora) {
+    if (timestamp instanceof Date && !Number.isNaN(timestamp)) {
+      return timestamp;
+    }
+    if (typeof timestamp === 'string' && timestamp) {
+      const parsed = new Date(timestamp);
+      if (!Number.isNaN(parsed)) return parsed;
+    }
+    return this.parseHour(hora) || new Date();
+  },
+
+  parseHour(hora) {
+    if (!hora) return null;
+    const normalized = String(hora).trim();
+    const today = new Date();
+    const base = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const match = normalized.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (!match) return null;
+
+    let hour = Number(match[1]);
+    const minute = Number(match[2]);
+    const ampm = (match[3] || '').toUpperCase();
+    if (ampm === 'PM' && hour < 12) hour += 12;
+    if (ampm === 'AM' && hour === 12) hour = 0;
+    return new Date(base.getFullYear(), base.getMonth(), base.getDate(), hour, minute);
+  },
+
+  getDeliveredOrders() {
+    return this.getOrdersFromState().filter(order => String(order.estado).toLowerCase().includes('entreg'));
+  },
+
   getOrdersByPeriod() {
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
-    return this.mockOrders.filter(order => {
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const delivered = this.getDeliveredOrders();
+
+    return delivered.filter(order => {
       const orderDate = new Date(order.timestamp.getFullYear(), order.timestamp.getMonth(), order.timestamp.getDate());
-      
       if (this.period === 'today') {
-        return orderDate.getTime() === today.getTime();
-      } else if (this.period === 'week') {
-        const weekAgo = new Date(today);
+        return orderDate.getTime() === startOfToday.getTime();
+      }
+      if (this.period === 'week') {
+        const weekAgo = new Date(startOfToday);
         weekAgo.setDate(weekAgo.getDate() - 7);
-        return orderDate >= weekAgo && orderDate <= today;
-      } else if (this.period === 'month') {
-        const monthAgo = new Date(today);
-        monthAgo.setDate(1);
-        return orderDate >= monthAgo && orderDate <= today;
+        return orderDate >= weekAgo && orderDate <= startOfToday;
+      }
+      if (this.period === 'month') {
+        return orderDate.getMonth() === startOfToday.getMonth() && orderDate.getFullYear() === startOfToday.getFullYear();
       }
       return true;
     });
@@ -45,19 +96,17 @@ const ANALYTICS = {
   getSalesByHour() {
     const orders = this.getOrdersByPeriod();
     const hourly = Array(24).fill(0);
-    
     orders.forEach(order => {
       const hour = order.timestamp.getHours();
       hourly[hour] += order.total;
     });
-    
     return hourly;
   },
 
   getTop5Dishes() {
     const orders = this.getOrdersByPeriod();
     const dishMap = {};
-    
+
     orders.forEach(order => {
       order.items.forEach(item => {
         if (!dishMap[item.id]) {
@@ -67,7 +116,7 @@ const ANALYTICS = {
         dishMap[item.id].revenue += item.qty * item.price;
       });
     });
-    
+
     return Object.values(dishMap)
       .sort((a, b) => b.qty - a.qty)
       .slice(0, 5);
@@ -81,18 +130,15 @@ const ANALYTICS = {
     }
 
     let csv = 'ID Pedido,Fecha,Hora,Estado,Platos,Cantidad,Precio Unitario,Total\n';
-    
     orders.forEach(order => {
       const date = order.timestamp.toLocaleDateString('es-CO');
       const time = order.timestamp.toLocaleTimeString('es-CO');
       const itemsStr = order.items.map(i => `${i.name} (${i.qty}x)`).join('; ');
       const qtyStr = order.items.map(i => i.qty).join('; ');
       const pricesStr = order.items.map(i => i.price).join('; ');
-      
       csv += `${order.id},"${date}","${time}","${order.estado}","${itemsStr}","${qtyStr}","${pricesStr}",${order.total}\n`;
     });
 
-    // Crear descarga
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -105,23 +151,21 @@ const ANALYTICS = {
     const canvas = document.getElementById('sales-chart');
     if (!canvas) return;
 
+    const orders = this.getOrdersByPeriod();
     const hourly = this.getSalesByHour();
-    const maxVal = Math.max(...hourly) || 100000;
+    const maxVal = Math.max(...hourly, 10000);
     const padding = 40;
     const width = canvas.width;
     const height = canvas.height;
-    const chartWidth = width - 2 * padding;
-    const chartHeight = height - 2 * padding;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
     const barWidth = chartWidth / 24;
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, width, height);
-
-    // Fondo
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    // Grid y ejes
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 5; i++) {
@@ -132,32 +176,35 @@ const ANALYTICS = {
       ctx.stroke();
     }
 
-    // Barras
-    ctx.fillStyle = '#1B6B3A';
     hourly.forEach((val, hour) => {
       const barHeight = (val / maxVal) * chartHeight;
       const x = padding + hour * barWidth + barWidth * 0.1;
       const y = height - padding - barHeight;
+      ctx.fillStyle = val > 0 ? '#1B6B3A' : '#cbd5e1';
       ctx.fillRect(x, y, barWidth * 0.8, barHeight);
     });
 
-    // Etiquetas X (cada 3 horas)
     ctx.fillStyle = '#64748b';
     ctx.font = '12px "Outfit", sans-serif';
     ctx.textAlign = 'center';
     for (let h = 0; h < 24; h += 3) {
       const x = padding + h * barWidth + barWidth / 2;
-      const y = height - padding + 20;
+      const y = height - padding + 18;
       ctx.fillText(`${String(h).padStart(2, '0')}h`, x, y);
     }
 
-    // Etiquetas Y - usar formatCOP si está disponible
     ctx.textAlign = 'right';
     const formatFunc = typeof formatCOP !== 'undefined' ? formatCOP : (val) => `$${val}`;
     for (let i = 0; i <= 5; i++) {
-      const val = Math.round((maxVal / 5) * i);
+      const value = Math.round((maxVal / 5) * i);
       const y = height - padding - (chartHeight / 5) * i + 4;
-      ctx.fillText(formatFunc(val), padding - 10, y);
+      ctx.fillText(formatFunc(value), padding - 10, y);
+    }
+
+    if (orders.length === 0) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.textAlign = 'center';
+      ctx.fillText('No hay ventas entregadas en este período', width / 2, height / 2);
     }
   },
 
@@ -172,20 +219,20 @@ const ANALYTICS = {
 
     const dishes = this.getTop5Dishes();
     const formatFunc = typeof formatCOP !== 'undefined' ? formatCOP : (val) => `$${val}`;
-    
+    const totalRevenue = this.getOrdersByPeriod().reduce((sum, order) => sum + order.total, 0) || 1;
+
     if (dishes.length === 0) {
       container.innerHTML = `
         <div class="flex flex-col items-center justify-center py-12 text-center">
           <svg class="w-16 h-16 text-slate-300 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375M9 16.5v5.625m0-5.625h6m-6 5.625h6m6-15.75h-2.25A2.25 2.25 0 0019.5 4.125V2.25h-15v1.875c0 1.243.975 2.25 2.25 2.25H3"></path>
           </svg>
-          <p class="text-slate-500 font-medium">No hay datos en este período</p>
+          <p class="text-slate-500 font-medium">No hay datos de ventas entregadas en este período</p>
         </div>
       `;
       return;
     }
 
-    const totalRevenue = this.getOrdersByPeriod().reduce((a, o) => a + o.total, 0) || 1;
     const html = dishes.map((dish, idx) => `
       <div class="flex items-center justify-between p-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
         <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -197,7 +244,7 @@ const ANALYTICS = {
         </div>
         <div class="text-right ml-4 flex-shrink-0">
           <p class="font-bold text-primary">${formatFunc(dish.revenue)}</p>
-          <p class="text-xs text-slate-500">${(dish.revenue / totalRevenue * 100).toFixed(1)}% del total</p>
+          <p class="text-xs text-slate-500">${((dish.revenue / totalRevenue) * 100).toFixed(1)}% del total</p>
         </div>
       </div>
     `).join('');

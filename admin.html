@@ -74,11 +74,12 @@
             display: flex !important;
             flex-direction: column;
             overflow-y: auto;
+            flex: 1;
         }
     </style>
 </head>
 
-<body class="text-slate-800 antialiased h-screen overflow-hidden flex">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Mobile Header -->
     <div
@@ -186,7 +187,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col bg-bg-light md:ml-64 h-full mt-16 md:mt-0 pb-0 min-h-0">
+    <main class="flex-1 flex flex-col bg-bg-light md:ml-64 mt-16 md:mt-0 pb-0 min-h-0 overflow-auto">
 
         <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="view-section active animate-in max-w-6xl mx-auto space-y-6 p-4 md:p-6 w-full">
@@ -333,71 +334,71 @@
         class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4"></div>
 
     <!-- Menu Modal -->
-    <div id="menu-modal"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-full max-w-md z-[60] hidden p-6 animate-in zoom-in duration-200"
-        style="max-height: 90vh; overflow-y: auto;">
-        <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
-            <h3 id="menu-modal-title" class="text-lg font-bold font-display text-slate-800">Nuevo Producto</h3>
-            <button onclick="closeModals()"
-                class="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"><svg width="20" height="20"
-                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M18 6L6 18M6 6l12 12"></path>
-                </svg></button>
-        </div>
-        <form id="menu-form" class="space-y-4">
-            <input type="hidden" id="menu-id">
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nombre del producto</label>
-                <input type="text" id="menu-nombre" required
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+    <div id="menu-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-auto p-6 max-h-[90vh] overflow-y-auto animate-in">
+            <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+                <h3 id="menu-modal-title" class="text-lg font-bold font-display text-slate-800">Nuevo Producto</h3>
+                <button onclick="closeModals()"
+                    class="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"><svg width="20" height="20"
+                        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg></button>
             </div>
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Descripción</label>
-                <textarea id="menu-desc" required
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none h-20"></textarea>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
+            <form id="menu-form" class="space-y-4">
+                <input type="hidden" id="menu-id">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Precio (COP)</label>
-                    <input type="number" id="menu-precio" required min="0"
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nombre del producto</label>
+                    <input type="text" id="menu-nombre" required
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Categoría</label>
-                    <select id="menu-categoria"
-                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-white">
-                        <option value="Entradas">Entradas</option>
-                        <option value="Platos">Platos</option>
-                        <option value="Bebidas">Bebidas</option>
-                        <option value="Postres">Postres</option>
-                    </select>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Descripción</label>
+                    <textarea id="menu-desc" required
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none h-20"></textarea>
                 </div>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">URL Imagen</label>
-                <input type="text" id="menu-imagen"
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
-                    placeholder="https://images.unsplash.com/...">
-            </div>
-            <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-lg mt-2">
-                <div>
-                    <p class="text-sm font-bold text-slate-800">Producto Activo</p>
-                    <p class="text-xs text-slate-500">¿Visible en el menú cliente?</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="menu-activo" class="sr-only peer" checked>
-                    <div
-                        class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Precio (COP)</label>
+                        <input type="number" id="menu-precio" required min="0"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                     </div>
-                </label>
-            </div>
-            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-2">
-                <button type="button" onclick="closeModals()"
-                    class="px-5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancelar</button>
-                <button type="submit"
-                    class="px-5 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl transition-colors shadow-sm focus:ring-2 focus:ring-primary/50">Guardar</button>
-            </div>
-        </form>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Categoría</label>
+                        <select id="menu-categoria"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-white">
+                            <option value="Entradas">Entradas</option>
+                            <option value="Platos">Platos</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Postres">Postres</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">URL Imagen</label>
+                    <input type="text" id="menu-imagen"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                        placeholder="https://images.unsplash.com/...">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-lg mt-2">
+                    <div>
+                        <p class="text-sm font-bold text-slate-800">Producto Activo</p>
+                        <p class="text-xs text-slate-500">¿Visible en el menú cliente?</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="menu-activo" class="sr-only peer" checked>
+                        <div
+                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                        </div>
+                    </label>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-2">
+                    <button type="button" onclick="closeModals()"
+                        class="px-5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="px-5 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl transition-colors shadow-sm focus:ring-2 focus:ring-primary/50">Guardar</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- QR Modal -->
@@ -428,35 +429,72 @@
 
 
     <script>
+        const STORAGE_KEY_PRODUCTOS = 'DeliBot_productos';
+
+        const DEFAULT_PRODUCTOS = [
+            { id: "e1", nombre: "Menú del dia", descripcion: "el mejor menu para cualquier dia", precio: 14000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "e2", nombre: "Pizza", descripcion: "Pizza de muy buena calidad", precio: 15000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "e3", nombre: "Hamburgesa con papas fritas", descripcion: "Hamburgesa barata y buena", precio: 20000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "p1", nombre: "Bandeja Saludable", descripcion: "Para que sigas con tu dieta puedes pedir este plato", precio: 20000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "p2", nombre: "Sopa de pollo", descripcion: "Sopa tradicional con pollo", precio: 15000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "p3", nombre: "Pollo con caldo", descripcion: "Caldo sustancioso con pollo ", precio: 28000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "p4", nombre: "Frijoles con arepa", descripcion: "Frijoles con arepa muy buenos", precio: 12000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "p5", nombre: "Carne con papas", descripcion: "Carne muy frezca con papas a su punto", precio: 20000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "b1", nombre: "Limonada", descripcion: "Bebida fria super deliciosa.", precio: 4000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "b3", nombre: "Café", descripcion: "Café tradicional hervido con canela y panela.", precio: 5000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "b4", nombre: "Jugo de mora", descripcion: "Bebida ancestral a base mora", precio: 5000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "d1", nombre: "Pastel de Chocolate", descripcion: "Pasetel de chocolate pa que quede lleno", precio: 30000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "d2", nombre: "Postre de Fresas", descripcion: "Fresas buenas para agregarle dulce a la comida", precio: 7000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "d3", nombre: "Brevas con Arequipe", descripcion: "Arequipe de la mas alta calidad", precio: 7000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
+            { id: "d4", nombre: "Torta de Estrellas", descripcion: "torta que viene del espacio", precio: 50000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=600&h=400&q=80", activo: true }
+        ];
+
+        function loadSavedProductos() {
+            const stored = localStorage.getItem(STORAGE_KEY_PRODUCTOS);
+            if (!stored) return null;
+            try {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length) return parsed;
+            } catch (error) {
+                console.warn('Error al leer productos guardados:', error);
+            }
+            return null;
+        }
+
+        function saveProductos() {
+            localStorage.setItem(STORAGE_KEY_PRODUCTOS, JSON.stringify(STATE.productos));
+        }
+
+        function getInitialProductos() {
+            const saved = loadSavedProductos();
+            return saved || DEFAULT_PRODUCTOS;
+        }
+
+        const STORAGE_KEY_PEDIDOS = 'DeliBot_pedidos';
+
+        function loadSavedOrders() {
+            const stored = localStorage.getItem(STORAGE_KEY_PEDIDOS);
+            if (!stored) return [];
+            try {
+                const parsed = JSON.parse(stored);
+                return Array.isArray(parsed) ? parsed.map(order => ({ ...order })) : [];
+            } catch (error) {
+                console.warn('Error al leer pedidos guardados:', error);
+                return [];
+            }
+        }
+
+        function saveOrders(orders) {
+            localStorage.setItem(STORAGE_KEY_PEDIDOS, JSON.stringify(orders));
+        }
+
         // Data State
+        const TODAY = new Date();
+        const BASE_DATE = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+
         let STATE = {
-            pedidos: [
-                { id: "ord-001", origen: "Mesa 3", items: [{ id: "p1", nombre: "Bandeja Saludable", cantidad: 2, precio: 20000 }, { id: "b4", nombre: "Jugo de mora", cantidad: 2, precio: 5000 }], total: 50000, estado: "En preparación", hora: "12:30 PM" },
-                { id: "ord-002", origen: "Domicilio", items: [{ id: "e2", nombre: "Pizza", cantidad: 1, precio: 15000 }, { id: "p2", nombre: "Sopa de pollo", cantidad: 1, precio: 15000 }], total: 30000, estado: "Recibido", hora: "12:45 PM" },
-                { id: "ord-003", origen: "Mesa 5", items: [{ id: "e3", nombre: "Hamburgesa con papas fritas", cantidad: 1, precio: 20000 }, { id: "b1", nombre: "Limonada", cantidad: 2, precio: 4000 }], total: 28000, estado: "Listo", hora: "12:15 PM" },
-                { id: "ord-004", origen: "Domicilio", items: [{ id: "p3", nombre: "Pollo con caldo", cantidad: 3, precio: 28000 }], total: 84000, estado: "Entregado", hora: "11:30 AM" },
-                { id: "ord-005", origen: "Mesa 1", items: [{ id: "p4", nombre: "Frijoles con arepa", cantidad: 1, precio: 12000 }, { id: "b3", nombre: "Café", cantidad: 2, precio: 5000 }], total: 22000, estado: "Recibido", hora: "12:55 PM" },
-                { id: "ord-006", origen: "Domicilio", items: [{ id: "d4", nombre: "Torta de Estrellas", cantidad: 1, precio: 50000 }], total: 50000, estado: "En preparación", hora: "12:40 PM" },
-                { id: "ord-007", origen: "Mesa 8", items: [{ id: "d1", nombre: "Pastel de Chocolate", cantidad: 2, precio: 30000 }], total: 60000, estado: "Listo", hora: "12:10 PM" },
-                { id: "ord-008", origen: "Domicilio", items: [{ id: "e1", nombre: "Menú del dia", cantidad: 2, precio: 14000 }], total: 28000, estado: "Entregado", hora: "11:00 AM" }
-            ],
-            productos: [
-                { id: "e1", nombre: "Menú del dia", descripcion: "el mejor menu para cualquier dia", precio: 14000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "e2", nombre: "Pizza", descripcion: "Pizza de muy buena calidad", precio: 15000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "e3", nombre: "Hamburgesa con papas fritas", descripcion: "Hamburgesa barata y buena", precio: 20000, categoria: "Entradas", imagen: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "p1", nombre: "Bandeja Saludable", descripcion: "Para que sigas con tu dieta puedes pedir este plato", precio: 20000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "p2", nombre: "Sopa de pollo", descripcion: "Sopa tradicional con pollo", precio: 15000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "p3", nombre: "Pollo con caldo", descripcion: "Caldo sustancioso con pollo ", precio: 28000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "p4", nombre: "Frijoles con arepa", descripcion: "Frijoles con arepa muy buenos", precio: 12000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "p5", nombre: "Carne con papas", descripcion: "Carne muy frezca con papas a su punto", precio: 20000, categoria: "Platos", imagen: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "b1", nombre: "Limonada", descripcion: "Bebida fria super deliciosa.", precio: 4000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "b3", nombre: "Café", descripcion: "Café tradicional hervido con canela y panela.", precio: 5000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "b4", nombre: "Jugo de mora", descripcion: "Bebida ancestral a base mora", precio: 5000, categoria: "Bebidas", imagen: "https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "d1", nombre: "Pastel de Chocolate", descripcion: "Pasetel de chocolate pa que quede lleno", precio: 30000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "d2", nombre: "Postre de Fresas", descripcion: "Fresas buenas para agregarle dulce a la comida", precio: 7000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "d3", nombre: "Brevas con Arequipe", descripcion: "Arequipe de la mas alta calidad", precio: 7000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=600&h=400&q=80", activo: true },
-                { id: "d4", nombre: "Torta de Estrellas", descripcion: "torta que viene del espacio", precio: 50000, categoria: "Postres", imagen: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=600&h=400&q=80", activo: true }
-            ],
+            pedidos: loadSavedOrders(),
+            productos: getInitialProductos(),
             mesas: [
                 { id: "m1", numero: 1, estado: "Libre" }, { id: "m2", numero: 2, estado: "Libre" }, { id: "m3", numero: 3, estado: "Ocupada" },
                 { id: "m4", numero: 4, estado: "Libre" }, { id: "m5", numero: 5, estado: "Ocupada" }, { id: "m6", numero: 6, estado: "Libre" },
@@ -557,8 +595,12 @@
         window.moveOrder = (id, curState) => {
             const idx = COLUMNAS.findIndex(c => c.id === curState);
             if (idx > -1 && idx < COLUMNAS.length - 1) {
-                const nextState = COLUMNAS[idx + 1].id;
+                let nextState = COLUMNAS[idx + 1].id;
+                if (curState === 'Listo') {
+                    nextState = 'Entregado';
+                }
                 STATE.pedidos = STATE.pedidos.map(p => p.id === id ? { ...p, estado: nextState } : p);
+                saveOrders(STATE.pedidos);
                 renderKanban();
                 renderDashboard();
             }
@@ -576,7 +618,12 @@
             ev.preventDefault();
             const id = ev.dataTransfer.getData("id");
             if (id) {
-                STATE.pedidos = STATE.pedidos.map(p => p.id === id ? { ...p, estado: newState } : p);
+                let finalState = newState;
+                if (newState === 'Listo') {
+                    finalState = 'Entregado';
+                }
+                STATE.pedidos = STATE.pedidos.map(p => p.id === id ? { ...p, estado: finalState } : p);
+                saveOrders(STATE.pedidos);
                 renderKanban();
                 renderDashboard();
             }
@@ -636,6 +683,14 @@
             document.getElementById('kanban-board').innerHTML = html;
         }
 
+        window.addEventListener('storage', (event) => {
+            if (event.key === STORAGE_KEY_PEDIDOS) {
+                STATE.pedidos = loadSavedOrders();
+                renderKanban();
+                renderDashboard();
+            }
+        });
+
         // Render Menu
         let searchTerm = '';
         document.getElementById('menu-search').addEventListener('input', e => {
@@ -645,12 +700,14 @@
 
         window.toggleProducto = (id) => {
             STATE.productos = STATE.productos.map(p => p.id === id ? { ...p, activo: !p.activo } : p);
+            saveProductos();
             renderMenu();
         };
 
         window.deleteProducto = (id) => {
             if (confirm('¿Eliminar producto?')) {
                 STATE.productos = STATE.productos.filter(p => p.id !== id);
+                saveProductos();
                 renderMenu();
             }
         };
@@ -698,6 +755,7 @@
             } else {
                 STATE.productos.unshift(nuevo);
             }
+            saveProductos();
             closeModals();
             renderMenu();
         });
