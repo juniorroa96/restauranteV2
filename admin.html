@@ -196,6 +196,52 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="dashboard-stats">
                 <!-- Stats injected here -->
             </div>
+
+            <!-- ANALYTICS SECTION -->
+            <div class="space-y-6 mt-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-200 pt-6">
+                    <div>
+                        <h3 class="text-xl font-bold font-display text-slate-800">Análisis de Ventas</h3>
+                        <p class="text-slate-500 text-sm mt-1">Solo incluye pedidos entregados</p>
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="updatePeriodButtons(this, 'today'); ANALYTICS.period='today'; ANALYTICS.render()" 
+                            class="period-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-primary text-white hover:bg-primary/90" 
+                            id="period-today">Hoy</button>
+                        <button onclick="updatePeriodButtons(this, 'week'); ANALYTICS.period='week'; ANALYTICS.render()" 
+                            class="period-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-slate-200 text-slate-700 hover:bg-slate-300" 
+                            id="period-week">Esta semana</button>
+                        <button onclick="updatePeriodButtons(this, 'month'); ANALYTICS.period='month'; ANALYTICS.render()" 
+                            class="period-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-slate-200 text-slate-700 hover:bg-slate-300" 
+                            id="period-month">Este mes</button>
+                        <button onclick="ANALYTICS.exportCSV()" 
+                            class="px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-2" 
+                            id="export-csv">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 2v16m-7-7l7 7 7-7"/>
+                            </svg>
+                            Exportar CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Sales by Hour -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h4 class="font-bold text-slate-800 mb-4">Ventas por hora</h4>
+                        <canvas id="sales-chart" width="600" height="300" style="max-width: 100%;"></canvas>
+                    </div>
+
+                    <!-- Top 5 Dishes -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <h4 class="font-bold text-slate-800 p-6 pb-0 mb-4">Top 5 platos</h4>
+                        <div class="flex-1 overflow-y-auto" id="top-5-dishes">
+                            <!-- Top 5 injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- PEDIDOS KANBAN VIEW -->
@@ -779,17 +825,33 @@
         // Agregar event listener al botón de logout
         document.getElementById('logout-btn')?.addEventListener('click', logout);
 
+        // Update period button styles
+        function updatePeriodButtons(btn, period) {
+            document.querySelectorAll('.period-btn').forEach(b => {
+                b.classList.remove('bg-primary', 'text-white', 'hover:bg-primary/90');
+                b.classList.add('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
+            });
+            btn.classList.remove('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
+            btn.classList.add('bg-primary', 'text-white', 'hover:bg-primary/90');
+        }
+
         // Initialize App
         function init() {
+
             checkSession();
             renderDashboard();
             renderKanban();
             renderMenu();
             renderMesas();
+            if (typeof ANALYTICS !== 'undefined') {
+                ANALYTICS.render();
+            }
         }
 
+    </script>
+    <script src="js/admin-analytics.js"></script>
+    <script>
         init();
-
     </script>
 </body>
 
