@@ -1,4 +1,7 @@
-const MENU_DATA = {
+const STORAGE_KEY_PRODUCTOS = 'DeliBot_productos';
+const STORAGE_KEY_PEDIDOS = 'DeliBot_pedidos';
+
+const DEFAULT_MENU_DATA = {
   "Entradas": [
     { id: 'e1', name: "Menú del dia", price: 14000, desc: "el mejor menu para cualquier dia", img: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=600&h=400&q=80" },
     { id: 'e2', name: "Pizza", price: 15000, desc: "Pizza de muy buena calidad", img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&h=400&q=80" },
@@ -24,9 +27,92 @@ const MENU_DATA = {
   ]
 };
 
+function buildMenuDataFromStoredProducts(products) {
+  const transformed = {};
+  products.forEach(item => {
+    if (!item.activo) return;
+    const category = item.categoria || 'Otros';
+    if (!transformed[category]) transformed[category] = [];
+    transformed[category].push({
+      id: item.id,
+      name: item.nombre || item.name,
+      desc: item.descripcion || item.desc,
+      price: item.precio || item.price,
+      img: item.imagen || item.img
+    });
+  });
+  return transformed;
+}
+
+function loadMenuData() {
+  const stored = localStorage.getItem(STORAGE_KEY_PRODUCTOS);
+  if (!stored) return JSON.parse(JSON.stringify(DEFAULT_MENU_DATA));
+
+  try {
+    const parsed = JSON.parse(stored);
+    if (Array.isArray(parsed) && parsed.length) {
+      const built = buildMenuDataFromStoredProducts(parsed);
+      const keys = Object.keys(built);
+      if (keys.length) return built;
+    }
+  } catch (error) {
+    console.warn('Error al cargar productos del menú:', error);
+  }
+
+  return JSON.parse(JSON.stringify(DEFAULT_MENU_DATA));
+}
+
+function loadCartOrders() {
+  const stored = localStorage.getItem(STORAGE_KEY_PEDIDOS);
+  if (!stored) return [];
+
+  try {
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn('Error al cargar pedidos:', error);
+    return [];
+  }
+}
+
+function saveCartOrders(orders) {
+  localStorage.setItem(STORAGE_KEY_PEDIDOS, JSON.stringify(orders));
+}
+
+function getMesaFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const mesa = params.get('mesa');
+  return mesa ? `Mesa ${mesa}` : 'Cliente';
+}
+
+function getOrderFromStorage(orderId) {
+  const orders = loadCartOrders();
+  return orders.find(order => order.id === orderId) || null;
+}
+
+function addCartOrder(order) {
+  const orders = loadCartOrders();
+  orders.push(order);
+  saveCartOrders(orders);
+}
+
+function updateOrderNote(note) {
+  orderNote = note;
+}
+
+let MENU_DATA = loadMenuData();
+
+function ensureActiveCategory() {
+  const categories = Object.keys(MENU_DATA);
+  if (!categories.includes(activeCat)) {
+    activeCat = categories[0] || '';
+  }
+}
+
 let cart = {}; // estado
 let activeCat = "Entradas";
 let searchQuery = "";
+let orderNote = '';
 let lastOrderId = localStorage.getItem('lastOrderId') || '';
 
 const STATUS_LABELS = {
@@ -41,6 +127,7 @@ const formatPrice = (price) => {
 };
 
 function renderTabs() {
+  ensureActiveCategory();
   const container = document.getElementById('tabs-container');
   container.innerHTML = '';
   Object.keys(MENU_DATA).forEach(cat => {
@@ -57,6 +144,7 @@ function renderTabs() {
 }
 
 function renderMenu() {
+  ensureActiveCategory();
   const grid = document.getElementById('menu-grid');
   grid.innerHTML = '';
   const query = searchQuery.trim().toLowerCase();
@@ -223,11 +311,40 @@ function toggleDrawer() {
 }
 
 function confirmOrder() {
-  toggleDrawer();
   const orderId = `ORD-${Date.now()}`;
+  const items = Object.values(cart).map(item => ({
+    id: item.id,
+    nombre: item.name || item.nombre,
+    cantidad: item.qty,
+    precio: item.price || item.precio
+  }));
+  const subtotal = items.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+  const timestamp = new Date();
+  const noteField = document.getElementById('order-note');
+  const note = noteField ? noteField.value.trim() : '';
+
+  const order = {
+    id: orderId,
+    origen: getMesaFromURL(),
+    items,
+    total: subtotal,
+    hora: timestamp.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+    estado: 'Recibido',
+    status: 'pending',
+    createdAt: timestamp.toISOString(),
+    nota: note
+  };
+
+  addCartOrder(order);
   saveOrderId(orderId);
   setOrderStatus('pending');
   setModalOrderId(orderId);
+  toggleDrawer();
+
+  if (noteField) {
+    noteField.value = '';
+  }
+  orderNote = '';
 
   setTimeout(() => {
     document.getElementById('success-modal').classList.add('active');
@@ -292,35 +409,10 @@ function setOrderStatus(status) {
 
 function normalizeStatus(status) {
   const normalized = String(status || '').trim().toLowerCase();
-  if (normalized.includes('pend')) return 'pending';
-  if (normalized.includes('cocina') || normalized.includes('prepar') || normalized.includes('kitchen')) return 'cooking';
-  if (normalized.includes('entreg') || normalized.includes('deliv') || normalized.includes('done')) return 'delivered';
+  if (normalized.includes('recibido')) return 'pending';
+  if (normalized.includes('cocina') || normalized.includes('prepar') || normalized.includes('kitchen') || normalized.includes('en preparación')) return 'cooking';
+  if (normalized.includes('listo') || normalized.includes('entreg') || normalized.includes('deliv') || normalized.includes('done')) return 'delivered';
   return 'pending';
-}
-
-function mockOrderStatus(orderId) {
-  const index = Array.from(orderId).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 3;
-  return ['Pendiente (en cola)', 'Cocina (en preparación)', 'Entregado'][index];
-}
-
-async function queryOrderStatus(orderId) {
-  if (!orderId) {
-    throw new Error('Falta el ID de pedido');
-  }
-
-  const url = `/api/order-status?orderId=${encodeURIComponent(orderId)}`;
-  try {
-    const response = await fetch(url, { method: 'GET' });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.status || data.estado || data.phase || mockOrderStatus(orderId);
-  } catch (error) {
-    console.warn('Error consultando estado del pedido:', error);
-    return mockOrderStatus(orderId);
-  }
 }
 
 async function handleStatusCheck() {
@@ -332,11 +424,18 @@ async function handleStatusCheck() {
   }
 
   saveOrderId(orderId);
-  setOrderStatus('pending');
+  const order = getOrderFromStorage(orderId);
+  if (!order) {
+    setOrderStatus('error');
+    return;
+  }
 
-  const statusText = await queryOrderStatus(orderId);
-  const normalized = normalizeStatus(statusText);
+  const normalized = normalizeStatus(order.estado || order.status);
   setOrderStatus(normalized);
+  const noteField = document.getElementById('order-note');
+  if (noteField) {
+    noteField.value = order.nota || '';
+  }
 }
 
 function initOrderStatus() {
@@ -354,7 +453,15 @@ function initOrderStatus() {
 
   if (lastOrderId) {
     input.value = lastOrderId;
-    setOrderStatus('pending');
+    const order = getOrderFromStorage(lastOrderId);
+    if (order) {
+      const normalized = normalizeStatus(order.estado || order.status);
+      setOrderStatus(normalized);
+      const noteField = document.getElementById('order-note');
+      if (noteField) noteField.value = order.nota || '';
+    } else {
+      setOrderStatus('pending');
+    }
   }
 }
 
@@ -365,5 +472,25 @@ function init() {
   renderMenu();
   updateCartUI();
 }
+
+window.addEventListener('storage', (event) => {
+  if (event.key === STORAGE_KEY_PRODUCTOS) {
+    MENU_DATA = loadMenuData();
+    renderTabs();
+    renderMenu();
+  }
+  if (event.key === STORAGE_KEY_PEDIDOS) {
+    const orderIdInput = document.getElementById('order-id-input');
+    const orderId = orderIdInput?.value?.trim() || lastOrderId;
+    if (orderId) {
+      const order = getOrderFromStorage(orderId);
+      if (order) {
+        setOrderStatus(normalizeStatus(order.estado || order.status));
+        const noteField = document.getElementById('order-note');
+        if (noteField) noteField.value = order.nota || '';
+      }
+    }
+  }
+});
 
 init();
