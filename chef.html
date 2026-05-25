@@ -171,6 +171,48 @@
             localStorage.setItem(STORAGE_KEY_PEDIDOS, JSON.stringify(orders));
         }
 
+        // ==================== TIMER FUNCTIONS ====================
+        function calculateTimeElapsed(createdAt, hora, estado) {
+            // No contar tiempo para órdenes entregadas
+            if (estado === 'Entregado') {
+                return 0;
+            }
+            
+            let timestamp = null;
+            
+            // Si createdAt es un ISO string, usarlo
+            if (createdAt && typeof createdAt === 'string' && createdAt.includes('T')) {
+                timestamp = new Date(createdAt);
+            } else if (hora && typeof hora === 'string') {
+                // Si solo tenemos la hora (HH:MM), reconstruir desde hoy
+                const [hours, minutes] = hora.split(':').map(Number);
+                const now = new Date();
+                timestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+                
+                // Si la hora calculada es en el futuro, restar un día (de ayer)
+                if (timestamp > new Date()) {
+                    timestamp.setDate(timestamp.getDate() - 1);
+                }
+            }
+            
+            if (!timestamp) return 0;
+            
+            const elapsed = Math.floor((new Date() - timestamp) / 1000);
+            return Math.max(0, elapsed);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function getTimerState(seconds) {
+            if (seconds < 15 * 60) return 'timer-green';
+            if (seconds < 30 * 60) return 'timer-orange';
+            return 'timer-red';
+        }
+
         window.allowDrop = (ev) => {
             ev.preventDefault();
         };
@@ -227,6 +269,10 @@
                 let cardsHtml = '';
 
                 peds.forEach(p => {
+                    const elapsed = calculateTimeElapsed(p.createdAt, p.hora, p.estado);
+                    const timerState = getTimerState(elapsed);
+                    const timeString = formatTime(elapsed);
+                    
                     const nextBtnHtml = col.id !== 'Entregado' ? `
                         <div class="absolute inset-0 bg-slate-900/5 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl z-10 cursor-pointer" onclick="moveOrder('${p.id}', '${p.estado}')">
                             <button class="bg-primary text-white border border-primary-dark px-4 py-2 rounded-lg font-bold shadow-xl flex items-center transform transition-transform hover:scale-105 active:scale-95 text-sm">
@@ -241,7 +287,14 @@
                                 <span class="font-bold text-slate-900 text-lg border-b-2 border-primary/20 leading-none pb-1">#${p.id.split('-')[1]}</span>
                                 <span class="px-2 py-0.5 rounded text-[10px] uppercase tracking-wide bg-slate-100 text-slate-600 font-bold border border-slate-200">${p.origen}</span>
                             </div>
-                            <div class="text-sm text-slate-600 mb-4 space-y-1.5 relative z-0">
+                            <div class="ticket-timer ${timerState}" data-order-id="${p.id}">
+                                <svg class="timer-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="9"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span class="timer-text">${timeString}</span>
+                            </div>
+                            <div class="text-sm text-slate-600 mb-4 space-y-1.5 relative z-0 mt-3">
                                 ${p.items.map(i => `<div class="flex items-start gap-2"><span class="font-bold text-slate-800">${i.cantidad}x</span><span class="leading-tight">${i.nombre}</span></div>`).join('')}
                             </div>
                             ${p.nota ? `<div class="text-sm text-slate-500 mb-3 p-2 bg-yellow-50 rounded border border-yellow-100"><strong>Nota:</strong> ${p.nota}</div>` : ''}
@@ -286,6 +339,36 @@
                 renderOrders();
             }
         });
+
+        // ==================== TIMER UPDATE INTERVAL ====================
+        function updateTimers() {
+            const orders = loadChefOrders();
+            const timerElements = document.querySelectorAll('.ticket-timer');
+            
+            timerElements.forEach(timerEl => {
+                const orderId = timerEl.dataset.orderId;
+                const order = orders.find(o => o.id === orderId);
+                
+                if (order) {
+                    const elapsed = calculateTimeElapsed(order.createdAt, order.hora, order.estado);
+                    const timerState = getTimerState(elapsed);
+                    const timeString = formatTime(elapsed);
+                    
+                    // Update time display
+                    const timerText = timerEl.querySelector('.timer-text');
+                    if (timerText) timerText.textContent = timeString;
+                    
+                    // Update state class
+                    timerEl.className = `ticket-timer ${timerState}`;
+                }
+            });
+        }
+
+        // Update timers every 1 second for real-time display
+        setInterval(updateTimers, 1000);
+        
+        // Also update on first load
+        setTimeout(updateTimers, 500);
 
         // ==================== INICIALIZACIÓN ====================
         checkSession();
